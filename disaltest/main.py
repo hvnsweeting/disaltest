@@ -13,10 +13,10 @@ except ImportError:
 class SaltSLSTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cliengine.write_config()
         cliengine.get_states()
         cliengine.get_pillar()
         cliengine.bootstrap_salt()
-        cliengine.write_config()
 '''
 
 TESTS_FILENAME = 'test_salt_states.py'
