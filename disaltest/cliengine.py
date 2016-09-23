@@ -51,7 +51,7 @@ def bootstrap_salt():
     run('virtualenv {0}'.format(VENV))
     run('./{0}/bin/pip install salt=={1}'.format(VENV, SALT_VERSION))
     run('salt-call --version', venv=VENV)
-    run('salt-call saltutil.sync_all', venv=VENV)
+    run('salt-call -c . saltutil.sync_all', venv=VENV)
 
 
 def get_states():
