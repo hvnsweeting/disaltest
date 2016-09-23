@@ -98,8 +98,8 @@ def shortern(result):
     Result = namedtuple('Result', ['success', 'false_count'])
     success = False
     false_count = 0
-    for k, v in result.iteritems():
-        if v['result'] is False:
+    for state_id, state_data in result.iteritems():
+        if state_data['result'] is False:
             false_count += 1
     if false_count == 0:
         success = True
