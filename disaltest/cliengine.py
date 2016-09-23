@@ -107,9 +107,9 @@ def shortern(result):
 
 
 def main():
-    # get_states()
+    get_states()
     get_pillar()
-    # bootstrap_salt()
+    bootstrap_salt()
     write_config()
     for sls in ('motd', 'vim'):
         print(test_state(sls))
@@ -118,4 +118,8 @@ def main():
 def test_state(slses):
     res = shortern(salt_call('state.sls {0}'.format(slses)))
     logger.info('%s: Failed %d', *res)
-    return res[0]
+    return res.success
+
+
+if __name__ == "__main__":
+    main()
