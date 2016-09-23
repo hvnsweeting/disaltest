@@ -11,9 +11,10 @@ Generate xml output.
 import json
 import os
 import logging
-
-import subprocess as spr
 import shlex
+import subprocess as spr
+
+from collections import namedtuple
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -94,13 +95,15 @@ def salt_call_short_result(saltargs):
 
 
 def shortern(result):
-    res = [True, 0]
+    Result = namedtuple('Result', ['success', 'false_count'])
+    success = False
+    false_count = 0
     for k, v in result.iteritems():
         if v['result'] is False:
-            res[1] += 1
-    if res[1] != 0:
-        res[0] = False
-    return res
+            false_count += 1
+    if false_count != 0:
+        success = False
+    return Result(success, false_count)
 
 
 def main():

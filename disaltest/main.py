@@ -30,7 +30,7 @@ def tests_generate():
     for test in ('motd', 'vim'):
         func = '''    def test_sls_{0}(self):
         res = cliengine.salt_call_short_result('state.sls {0}')
-        self.assertEqual(res[0], True, 'states failed: %d' % res[1])\n'''.format(test)
+        self.assertEqual(res.success, True, 'states failed: %d' % res.false_count)\n'''.format(test)
         content += func
     content += test_main
 
