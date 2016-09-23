@@ -5,6 +5,11 @@ unittest_tpl = '''
 import cliengine
 import unittest
 
+try:
+    import xmlrunner
+except ImportError:
+    xmlrunner = None
+
 class SaltSLSTest(unittest.TestCase):
 '''
 
@@ -12,9 +17,12 @@ TESTS_FILENAME = 'test_salt_states.py'
 
 test_main = '''
 if __name__ == "__main__":
-    unittest.main()
+    if xmlrunner is not None:
+	unittest.main(testRunner=xmlrunner.XMLTestRunner(
+	    output='.', outsuffix='salt'))
+    else:
+        unittest.main()
 '''
-
 
 def tests_generate():
     content = unittest_tpl
