@@ -101,8 +101,8 @@ def shortern(result):
     for k, v in result.iteritems():
         if v['result'] is False:
             false_count += 1
-    if false_count != 0:
-        success = False
+    if false_count == 0:
+        success = True
     return Result(success, false_count)
 
 
