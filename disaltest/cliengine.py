@@ -56,7 +56,7 @@ def bootstrap_salt():
 
 def get_states():
     if not os.path.isdir('states'):
-        run('git clone git@github.com:hvnsweeting/states.git')
+        run('git clone https://github.com/hvnsweeting/states.git')
 
 
 def get_pillar():
