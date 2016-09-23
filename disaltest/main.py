@@ -8,6 +8,7 @@ Run test
 Generate xml output.
 '''
 
+import json
 import os
 import logging
 
@@ -30,11 +31,16 @@ def create_root_dir():
 create_root_dir()
 
 
-def run(scmd, venv=''):
+def run(scmd, venv='', runfunc=spr.call):
     if venv:
         scmd = '{0}/bin/{1}'.format(venv, scmd)
     logger.debug('Running %s  CWD: %s', scmd, os.getcwd())
-    spr.call(shlex.split(scmd))
+    cmd = shlex.split(scmd)
+    return runfunc(cmd)
+
+
+def run_output(scmd, venv=''):
+    return run(scmd, venv, runfunc=spr.check_output)
 
 
 VENV = 'dst_env'
@@ -55,10 +61,12 @@ def get_states():
 def get_pillar():
     if not os.path.isdir('pillar'):
         os.mkdir('pillar')
+    import shutil
+    shutil.copyfile('basepillar.sls', 'pillar/common.sls')
+
     os.chdir('pillar')
 
-    if not os.path.isfile('common.sls'):
-        run('curl -Lo common.sls https://gist.githubusercontent.com/hvnsweeting/d8143b10e02fff01c434/raw/4f6497b624b43d7590131caa3ccd5660dc1dcaec/common.sls')
+    # run('curl -Lo common.sls https://gist.githubusercontent.com/hvnsweeting/d8143b10e02fff01c434/raw/4f6497b624b43d7590131caa3ccd5660dc1dcaec/common.sls')
 
     with open('top.sls', 'w') as f:
         f.write('''base:\n  '*':\n    - common''')
@@ -73,15 +81,36 @@ def write_config():
 
 def salt_call(saltargs):
     print(os.getcwd())
-    run('salt-call -c . {0}'.format(saltargs), venv='dst_env')
+    out = run_output('salt-call --out=json -c . {0}'.format(saltargs),
+                     venv='dst_env')
+    result = json.loads(out)['local']
+    return result
+
+
+def evaluate_result(result):
+    res = [True, 0]
+    for k, v in result.iteritems():
+        if v['result'] is False:
+            res[1] += 1
+    if res[1] != 0:
+        res[0] = False
+    return res
 
 
 def main():
     # get_states()
     get_pillar()
-    bootstrap_salt()
+    # bootstrap_salt()
     write_config()
-    salt_call('state.sls vim')
+    for sls in ('motd', 'vim'):
+        print(test_state(sls))
+
+
+def test_state(slses):
+    res = evaluate_result(salt_call('state.sls {0}'.format(slses)))
+    logger.info('%s: Failed %d', *res)
+    return res[0]
+
 
 if __name__ == "__main__":
     main()
