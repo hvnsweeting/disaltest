@@ -79,15 +79,21 @@ def write_config():
         fout.write(fin.read().format(os.path.abspath(os.getcwd())))
 
 
-def salt_call(saltargs):
+def salt_call(saltargs, res_processor=None):
     print(os.getcwd())
     out = run_output('salt-call --out=json -c . {0}'.format(saltargs),
                      venv='dst_env')
     result = json.loads(out)['local']
+    if res_processor:
+        return res_processor(result)
     return result
 
 
-def evaluate_result(result):
+def salt_call_short_result(saltargs):
+    return salt_call(saltargs, res_processor=shortern)
+
+
+def shortern(result):
     res = [True, 0]
     for k, v in result.iteritems():
         if v['result'] is False:
@@ -107,6 +113,6 @@ def main():
 
 
 def test_state(slses):
-    res = evaluate_result(salt_call('state.sls {0}'.format(slses)))
+    res = shortern(salt_call('state.sls {0}'.format(slses)))
     logger.info('%s: Failed %d', *res)
     return res[0]

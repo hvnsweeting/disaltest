@@ -18,17 +18,19 @@ TESTS_FILENAME = 'test_salt_states.py'
 test_main = '''
 if __name__ == "__main__":
     if xmlrunner is not None:
-	unittest.main(testRunner=xmlrunner.XMLTestRunner(
-	    output='.', outsuffix='salt'))
+        unittest.main(testRunner=xmlrunner.XMLTestRunner(
+            output='.', outsuffix='salt'))
     else:
         unittest.main()
 '''
+
 
 def tests_generate():
     content = unittest_tpl
     for test in ('motd', 'vim'):
         func = '''    def test_sls_{0}(self):
-        self.assertTrue(cliengine.test_state('{0}'))\n'''.format(test)
+        res = cliengine.salt_call_short_result('state.sls {0}')
+        self.assertEqual(res[0], True, 'states failed: %d' % res[1])\n'''.format(test)
         content += func
     content += test_main
 
