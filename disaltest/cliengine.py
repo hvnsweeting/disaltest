@@ -56,11 +56,11 @@ def get_states():
         run('git clone https://github.com/hvnsweeting/states.git')
 
 
-def get_pillar():
+def get_pillar(pillarfile='basepillar.sls'):
     if not os.path.isdir('pillar'):
         os.mkdir('pillar')
     import shutil
-    shutil.copyfile('basepillar.sls', 'pillar/common.sls')
+    shutil.copyfile(pillarfile, 'pillar/common.sls')
 
     os.chdir('pillar')
 
