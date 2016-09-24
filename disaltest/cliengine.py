@@ -20,9 +20,6 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-SALT_VERSION = os.environ.get('DST_SALT_VERSION', '2014.7.5')
-
-
 def create_root_dir():
     try:
         os.mkdir('tmp')
@@ -47,9 +44,9 @@ def run_output(scmd, venv=''):
 VENV = 'dst_env'
 
 
-def bootstrap_salt():
+def bootstrap_salt(salt_version):
     run('virtualenv {0}'.format(VENV))
-    run('./{0}/bin/pip install salt=={1}'.format(VENV, SALT_VERSION))
+    run('./{0}/bin/pip install salt=={1}'.format(VENV, salt_version))
     run('salt-call --version', venv=VENV)
     run('salt-call -c . saltutil.sync_all', venv=VENV)
 
@@ -75,9 +72,15 @@ def get_pillar():
     os.chdir('..')
 
 
-def write_config():
+def write_config(states_path, pillar_path):
     with open('minion.tpl') as fin, open('minion', 'w') as fout:
-        fout.write(fin.read().format(os.path.abspath(os.getcwd())))
+        minion_conf = fin.read()
+        minion_conf = minion_conf.format(
+            workspace=os.getcwd(),
+            states_path=states_path,
+            pillar_path=pillar_path,
+        )
+        fout.write(minion_conf)
 
 
 def salt_call(saltargs, res_processor=None):
@@ -95,6 +98,13 @@ def salt_call_short_result(saltargs):
 
 
 def shortern(result):
+    if not isinstance(result, dict):
+        logger.warning(
+            'Expected dict, got %s, seems state/pillar failed to render: %s',
+            type(result),
+            result
+        )
+
     Result = namedtuple('Result', ['success', 'false_count'])
     success = False
     false_count = 0

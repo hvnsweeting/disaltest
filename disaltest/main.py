@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
+import os
+import cliengine
 unittest_tpl = '''
 import cliengine
 import unittest
@@ -11,13 +14,10 @@ except ImportError:
     xmlrunner = None
 
 class SaltSLSTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cliengine.write_config()
-        cliengine.get_states()
-        cliengine.get_pillar()
-        cliengine.bootstrap_salt()
 '''
+
+SALT_VERSION = os.environ.get('DST_SALT_VERSION', '2014.7.5')
+
 
 TESTS_FILENAME = 'test_salt_states.py'
 
@@ -44,7 +44,23 @@ def tests_generate():
         f.write(content)
 
 
-if __name__ == "__main__":
+def prepare_salt(states_dir, pillar_dir, salt_version=SALT_VERSION):
+    # cliengine.get_states()
+    # cliengine.get_pillar()
+
+    cliengine.write_config(states_dir, pillar_dir)
+    cliengine.bootstrap_salt(salt_version)
+
+
+def main():
+    argp = argparse.ArgumentParser()
+    argp.add_argument('--states', default='states')
+    argp.add_argument('--pillar', default='pillar')
+    args = argp.parse_args()
+    prepare_salt(args.states, args.pillar)
     tests_generate()
     import subprocess as spr
     spr.check_output(['python', TESTS_FILENAME])
+
+if __name__ == "__main__":
+    main()
