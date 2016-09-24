@@ -38,7 +38,9 @@ def tests_generate(slses):
     for test in slses:
         func = '''    def test_sls_{0}(self):
         res = cliengine.salt_call_short_result('state.sls {0}')
-        self.assertEqual(res.success, True, 'states failed: %d' % res.false_count)\n'''.format(test)
+        self.assertEqual(res.success, True,
+            'states failed: %d' % res.false_count
+        )\n'''.format(test)
         content += func
     content += test_main
 
@@ -59,8 +61,9 @@ def main():
     argp.add_argument('slses', default='motd', nargs='+')
     argp.add_argument('--states', default='states')
     argp.add_argument('--pillar', default='pillar')
+    argp.add_argument('--version', default='2014.7.5')
     args = argp.parse_args()
-    prepare_salt(args.states, args.pillar)
+    prepare_salt(args.states, args.pillar, args.version)
     tests_generate(args.slses)
     import subprocess as spr
     spr.check_output(['python', TESTS_FILENAME])
