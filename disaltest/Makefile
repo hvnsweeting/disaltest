@@ -1,2 +1,2 @@
 all:
-	pylint -rn main.py cliengine.py
+	pylint --rcfile=../.pylintrc main.py cliengine.py
