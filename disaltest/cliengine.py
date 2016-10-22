@@ -10,6 +10,7 @@ Generate xml output.
 
 import json
 import os
+import sys
 import logging
 import shlex
 import shutil
@@ -83,7 +84,8 @@ def write_config(states_path, pillar_path):
     if os.path.isfile(pillar_path):
         pillar_path = os.path.dirname(pillar_path)
 
-    with open('minion.tpl') as fin, open('minion', 'w') as fout:
+    tpl_path = os.path.join(os.path.dirname(sys.argv[0]), 'minion.tpl')
+    with open(tpl_path) as fin, open('minion', 'w') as fout:
         minion_conf = fin.read()
         minion_conf = minion_conf.format(
             workspace=os.getcwd(),
