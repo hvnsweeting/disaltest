@@ -12,6 +12,7 @@ import json
 import os
 import logging
 import shlex
+import shutil
 import subprocess as spr
 
 from collections import namedtuple
@@ -57,6 +58,11 @@ def get_states():
 
 
 def get_pillar(pillarfile='basepillar.sls'):
+    # if we got a dir, use it
+    if os.path.isdir(pillarfile):
+        shutil.copytree(pillarfile, 'pillar')
+        return
+
     if not os.path.isdir('pillar'):
         os.mkdir('pillar')
     import shutil
