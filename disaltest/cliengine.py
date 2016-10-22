@@ -65,7 +65,6 @@ def get_pillar(pillarfile='basepillar.sls'):
 
     if not os.path.isdir('pillar'):
         os.mkdir('pillar')
-    import shutil
     shutil.copyfile(pillarfile, 'pillar/common.sls')
 
     os.chdir('pillar')
