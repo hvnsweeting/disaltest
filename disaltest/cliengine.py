@@ -60,6 +60,8 @@ def get_states():
 def get_pillar(pillarfile='basepillar.sls'):
     # if we got a dir, use it
     if os.path.isdir(pillarfile):
+        if os.path.basename(pillarfile) == 'pillar':
+            return
         shutil.copytree(pillarfile, 'pillar')
         return
 
