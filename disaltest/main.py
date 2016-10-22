@@ -50,7 +50,7 @@ def tests_generate(slses):
 
 def prepare_salt(states_dir, pillar_dir, salt_version=SALT_VERSION):
     # cliengine.get_states()
-    cliengine.get_pillar()
+    cliengine.get_pillar(pillar_dir)
 
     cliengine.write_config(states_dir, pillar_dir)
     cliengine.bootstrap_salt(salt_version)

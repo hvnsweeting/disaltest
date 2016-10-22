@@ -79,6 +79,9 @@ def get_pillar(pillarfile='basepillar.sls'):
 
 
 def write_config(states_path, pillar_path):
+    if os.path.isfile(pillar_path):
+        pillar_path = os.path.dirname(pillar_path)
+
     with open('minion.tpl') as fin, open('minion', 'w') as fout:
         minion_conf = fin.read()
         minion_conf = minion_conf.format(
@@ -86,6 +89,7 @@ def write_config(states_path, pillar_path):
             states_path=states_path,
             pillar_path=pillar_path,
         )
+        logger.debug("Minion config content: %s", minion_conf)
         fout.write(minion_conf)
 
 
